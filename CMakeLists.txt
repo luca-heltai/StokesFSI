@@ -20,5 +20,5 @@ INCLUDE_DIRECTORIES(
 	include
 	)
 
-ADD_EXECUTABLE(project source/main.cc source/project.cpp)
+ADD_EXECUTABLE(project source/main.cc)
 DEAL_II_SETUP_TARGET(project)

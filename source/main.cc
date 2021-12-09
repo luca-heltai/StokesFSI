@@ -1,4 +1,4 @@
-#include "project.h"
+#include "StokesFSI.h"
 
 
 
@@ -18,7 +18,7 @@ void StokesFSI<dim>::make_grid()
         
     const Point<dim> top_right = (dim == 2 ?
                                   Point<dim>(lenght, height) :           // 2d
-                                  Point<dim>(lenght, width, height));   // 3d
+                                  Point<dim>(lenght, width, height));    // 3d
         
     GridGenerator::hyper_rectangle(triangulation,Point<dim>(),top_right);
     triangulation.refine_global(refinements);
@@ -62,6 +62,11 @@ void StokesFSI<dim>::make_grid()
         }
             
     }
+    
+    std::ofstream out("reference_grid_"+Utilities::int_to_string(dim)+"D.vtk");
+    GridOut       grid_out;
+    grid_out.write_vtk(triangulation, out);
+    std::cout << "Grid saved." << std::endl;
 }
 
 
@@ -384,53 +389,13 @@ StokesFSI<dim>::run()
     make_grid();
     setup_dofs();
     
-    std::vector<unsigned int> block_component(dim + 1, 0);
-    block_component[dim] = 1;
-    const std::vector<types::global_dof_index> dofs_per_block =
-      DoFTools::count_dofs_per_fe_block(dh, block_component);
-    const unsigned int n_v = dofs_per_block[0];
-    const unsigned int n_p = dofs_per_block[1];
-    
-    for (unsigned int i=0; i<n_v; i++)
-        std::cout << displacement(i) << std::endl;
-    
-    std::cout << "---------------------------------------" << std::endl;
-    std::cout << "---------------------------------------" << std::endl;
-    std::cout << "---------------------------------------" << std::endl;
-    
-    for (unsigned int i=n_v; i<n_v+n_p; i++)
-        std::cout << displacement(i) << std::endl;
-    
-    std::cout << "---------------------------------------" << std::endl;
-    std::cout << "---------------------------------------" << std::endl;
-    std::cout << "---------------------------------------" << std::endl;
-    
     VectorTools::project(dh,
                          constraints,
                          QGauss<dim>(degree + 2),
                          InitialValues<dim>(),
                          displacement);
     
-    for (unsigned int i=0; i<n_v; i++)
-        std::cout << displacement(i) << std::endl;
-    
-    std::cout << "---------------------------------------" << std::endl;
-    std::cout << "---------------------------------------" << std::endl;
-    std::cout << "---------------------------------------" << std::endl;
-    
-    for (unsigned int i=n_v; i<n_v+n_p; i++)
-    {
-        std::cout << displacement(i) << std::endl;
-        //displacement(i)=0;
-    }
-        
-    
-    std::cout << "---------------------------------------" << std::endl;
-    std::cout << "---------------------------------------" << std::endl;
-    std::cout << "---------------------------------------" << std::endl;
-    
     output_results(0);
-    
     
     do
     {
@@ -462,8 +427,8 @@ int main()
     {
       StokesFSI<2> problem(1);
       problem.run();
-      StokesFSI<3> problems(1);
-      problems.run();
+      //StokesFSI<3> problems(1);
+      //problems.run();
     }
   catch (std::exception &exc)
     {
