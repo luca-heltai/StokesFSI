@@ -141,17 +141,17 @@ SchurComplement<PreconditionerType>::vmult(Vector<double> &      dst,
 
 
 // Size of the "pool"
-const double lenght = 10.; // x
+const double length = 10.; // x
 const double width  = 3.;  // y
 const double height = 5.;  // z
 
-const double       max_displacement               = 2;
-const double       solid_liquid_height_proportion = 1. / 5;
-const unsigned int refinements                    = 3;
+const double       max_displacement               = 1;
+const double       solid_liquid_height_proportion = 1. / 2.;
+const unsigned int refinements                    = 5;
 
 const double time_step = .1;
-const double mu        = 1.;
-const double eta       = .5;
+const double mu        = 1000.;
+const double eta       = 1.0;
 
 
 /* ------------------------------- */
@@ -183,6 +183,7 @@ public:
       }
     else if (component == dim)
       return 0.;
+    return 0;
   }
 
   virtual void
@@ -279,9 +280,11 @@ private:
   BlockVector<double> solution;
   BlockVector<double> system_rhs;
 
+  Vector<double> material_mask;
 
-
-  Vector<double> displacement;
+  BlockVector<double> displacement;
+  std::unique_ptr<MappingQEulerian<dim, BlockVector<double>>>
+    displacement_mapping;
 
   DiscreteTime time;
 
