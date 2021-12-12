@@ -22,3 +22,4 @@ INCLUDE_DIRECTORIES(
 
 ADD_EXECUTABLE(project source/main.cc)
 DEAL_II_SETUP_TARGET(project)
+add_custom_target(indent clang-format -i source/*cc include/*h WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
